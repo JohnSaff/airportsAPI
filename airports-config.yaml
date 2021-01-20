@@ -1,0 +1,282 @@
+openapi: 3.0.0
+info:
+  title: Airports API
+  description: Get all your airport data here https://raw.githubusercontent.com/WhiteHatLearningProducts/airports/master/airportsData.json
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: if you are using NodeJS your dev port might be 3000
+  - url: http://localhost:8080
+    description: if you are using Spring your dev port will be 8080
+  - url: https://airports-api.whitehatcoaches.org.uk
+    description: this is the production baseURL
+paths:
+  /airports:
+    get:
+      summary: Returns a list of all the airports
+      description: |
+        -gets all the airports, returns 200 with all the data
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: the page number you want to see
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: The number of items you want to see in a page. default is 100
+      responses:
+        200:
+          description: an array of JSON objects that represent each airport
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    icao:
+                      type: string
+                    iata:
+                      type: string
+                    name:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    country:
+                      type: string
+                    elevation:
+                      type: integer
+                    lat:
+                      type: number
+                      format: double
+                    lon:
+                      type: number
+                      format: double
+                    tz:
+                      type: string
+    post:
+      summary: create a new airport
+      description: |
+        - creates new airport into the airports JSON
+        - returns 201 if successful
+        - returns 400 if icao already exists
+        - returns 400 if the JSON doesn't match the correct format
+        - returns 415 if body is not a JSON
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                icao:
+                  type: string
+                iata:
+                  type: string
+                name:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                elevation:
+                  type: integer
+                lat:
+                  type: number
+                  format: double
+                lon:
+                  type: number
+                  format: double
+                tz:
+                  type: string
+              required:
+                - icao
+                - name
+                - city
+      responses:
+        201:
+          description: succesfuly created an airport
+          content:
+            'application/json': {}
+        400:
+          description: |
+            bad request, incorrect fields or icao already exists
+            - provided data did not match the correct fields, or the icao already exists
+            did you mean to PUT or PATCH it perhaps?
+          content:
+              'application/json': {}
+        415:
+          description: unsupported media type, provided data was not in JSON format
+          content:
+            'application/json': {}
+  /airports/{icao}:
+    get:
+      description: |
+        Returns airport based on icao
+        - returns 200 if successful
+        - returns 404 if airport not found
+      summary: find airport by icao
+      operationId: getAirportByIcao
+      responses:
+        200:
+          description: airport response
+          content:
+            'application/json':
+              schema:
+                properties:
+                  icao:
+                    type: string
+                  iata:
+                    type: string
+                  name:
+                    type: string
+                  city:
+                    type: string
+                  state:
+                    type: string
+                  country:
+                    type: string
+                  elevation:
+                    type: integer
+                  lat:
+                    type: number
+                    format: double
+                  lon:
+                    type: number
+                    format: double
+                  tz:
+                    type: string
+                example:
+                  icao: "00AK"
+                  iata: ""
+                  name: "Lowell Field"
+                  city: "Anchor Point"
+                  state: "Alaska"
+                  country: "US"
+                  elevation: 450
+                  lat: 59.94919968
+                  lon: -151.695999146
+                  tz: "America/Anchorage"
+        404:
+          description: airport not found
+          content:
+            'application/json': {}
+    put:
+      description: |
+        Replace the airport with a new airport with the same icao
+        - returns 200 if okay
+        - returns 400 if JSON fields don't match the correct ones
+        - returns 404 if airport is not found
+        - returns 415 if request body isn't JSON
+      operationId: replaceAirportKeepIcao
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                iata:
+                  type: string
+                name:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                elevation:
+                  type: integer
+                lat:
+                  type: number
+                  format: double
+                lon:
+                  type: number
+                  format: double
+                tz:
+                  type: string
+      responses:
+        200:
+          description: successfully updated entire airport
+          content:
+            'application/json': {}
+        400:
+          description: bad request, provided data did not match the correct fields
+          content:
+            'application/json': {}
+        404:
+          description: airport not found, did you mean to POST it perhaps
+          content:
+            'application/json': {}
+        415:
+          description: unsupported media type, provided data was not in JSON format
+          content:
+            'application/json': {}
+    patch:
+      description: |
+        Update an airport with a new information by icao
+        - returns 200 if okay
+        - returns 400 if JSON fields don't match the correct ones
+        - returns 404 if airport is not found
+        - returns 415 if request body isn't JSON
+      operationId: updateAirportByIcao
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                icao:
+                  type: string
+                iata:
+                  type: string
+                name:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                elevation:
+                  type: integer
+                lat:
+                  type: number
+                  format: double
+                lon:
+                  type: number
+                  format: double
+                tz:
+                  type: string
+      responses:
+        200:
+          description: successfully updated airport
+          content:
+            'application/json': {}
+        400:
+          description: bad request, provided data did not match the correct fields
+          content:
+            'application/json': {}
+        404:
+          description: airport not found, did you mean to POST it perhaps?
+          content:
+            'application/json': {}
+        415:
+          description: unsupported media type provided data was not in JSON format
+          content:
+            'application/json': {}
+    delete:
+      description: |
+        delete an airport, ignores any body sent and deletes the airport
+        - returns 204 if sucessfully deleted
+        - returns 404 if airport is not found
+      responses:
+        204:
+          description: nothing is here anymore, you deleted it.
+        404:
+          description: airport not found
+          content:
+            'application/json': {}
